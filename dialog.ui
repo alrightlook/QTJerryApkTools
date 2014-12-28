@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>382</width>
-    <height>150</height>
+    <height>208</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,10 +19,22 @@
      <x>50</x>
      <y>50</y>
      <width>205</width>
-     <height>99</height>
+     <height>110</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="MainLoginLayout">
+    <property name="leftMargin">
+     <number>10</number>
+    </property>
+    <property name="topMargin">
+     <number>10</number>
+    </property>
+    <property name="rightMargin">
+     <number>10</number>
+    </property>
+    <property name="bottomMargin">
+     <number>10</number>
+    </property>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
@@ -33,7 +45,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit"/>
+       <widget class="QLineEdit" name="userName"/>
       </item>
      </layout>
     </item>
@@ -47,7 +59,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit_2"/>
+       <widget class="QLineEdit" name="userPassword"/>
       </item>
      </layout>
     </item>

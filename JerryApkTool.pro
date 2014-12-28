@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,8 +13,11 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        dialog.cpp
+        dialog.cpp \
+    toolwindow.cpp
 
-HEADERS  += dialog.h
+HEADERS  += dialog.h \
+    toolwindow.h
 
-FORMS    += dialog.ui
+FORMS    += dialog.ui \
+    toolwindow.ui
