@@ -6,6 +6,8 @@
 #include "qdebug.h"
 #include "commandlinethread.h"
 #include "parsemanifest.h"
+#include "QProcessEnvironment"
+#include "qpainter.h"
 
 ToolWindow::ToolWindow(QWidget *parent) :
     QWidget(parent),
@@ -21,8 +23,14 @@ ToolWindow::ToolWindow(QWidget *parent) :
     QObject::connect(&mCmdThread, SIGNAL(started()), this, SLOT(onCmdThreadStart()));
     QObject::connect(&mCmdThread, SIGNAL(finished()), this, SLOT(onCmdThreadFinished()));
 
-
+    QString env = getenv("PATH");
+    qDebug () <<"Get evn is:" + env;
+    env += ":/usr/local/bin/";
+    qDebug() << "env new is:" + env;
+    setenv("PATH", env.toStdString().c_str(), 1);
     qDebug() << mApkDecomplePath;
+    env = getenv("PATH");
+    qDebug()<<"The set env reslut is:" + env;
     mApkDecompileDir.setPath(mApkDecomplePath);
     if(!mApkDecompileDir.exists()) {
         mApkDecompileDir.mkpath(".");
@@ -43,8 +51,10 @@ void ToolWindow::onCmdThreadFinished()
     if(mCmdThread.GetCommandType() == CommandLineThread::APKDECOMPILE) {
 
         QString manifestPath = mApkDecomplePath + "/AndroidManifest.xml";
+        mAndroidManifestPath = manifestPath;
         qDebug()<<"The androidmanivest path is:" + manifestPath;
         ParseManifest pm(manifestPath);
+        ui->PackageNameEdit->setText(pm.getPackageName());
     }
     mProgressDialog.close();
 }
@@ -72,4 +82,44 @@ void ToolWindow::on_pushButton_2_clicked()
      mCmdThread.SetCommandType(CommandLineThread::APKDECOMPILE);
      mCmdThread.SetCommandLine(apktoolCmd);
      mCmdThread.start();
+}
+
+void ToolWindow::on_pushButton_clicked()
+{
+    if (ui->PackageNameEdit->text() != "") {
+        if(mCmdThread.isFinished()) {
+
+            ParseManifest pm(mAndroidManifestPath);
+            pm.setPackageName(ui->PackageNameEdit->text());
+            mCmdThread.SetCommandType(CommandLineThread::APKCOMPILE);
+            QString apkSavedPath = QFileDialog::getSaveFileName(this, "Build Apk", "", "All apk Files(*.apk)");
+            QString apktoolBuildCmd = "apktool b " + mApkDecomplePath + " " + apkSavedPath;
+            qDebug() << "The build cmd is:" + apktoolBuildCmd;
+            mCmdThread.SetCommandLine(apktoolBuildCmd);
+            mCmdThread.start();
+        }
+
+    }
+}
+
+void ToolWindow::on_pushButton_3_clicked()
+{
+    mChooseIconPath = QFileDialog::getOpenFileName(this, "Choose Icon", "", "PNG files(*.png)");
+    qDebug() << "The image path :" + mChooseIconPath;
+    chooseIconPixmap.load(mChooseIconPath);
+    ui->LabelPreview->setPixmap(chooseIconPixmap);
+}
+
+void ToolWindow::on_pushButton_4_clicked()
+{
+    mChooseCornerPath = QFileDialog::getOpenFileName(this, "Choose corner", "", "PNG files(*.png)");
+    chooseCornerPixmap.load(mChooseCornerPath);
+    QPainter painter;
+    painter.begin(&chooseIconPixmap);
+    painter.setCompositionMode(QPainter::CompositionMode_Source);
+    painter.drawPixmap(0,0, chooseIconPixmap);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+    painter.drawPixmap(0,0, chooseCornerPixmap);
+    painter.save();
+    ui->LabelPreview->setPixmap(chooseIconPixmap);
 }

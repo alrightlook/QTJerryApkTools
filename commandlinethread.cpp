@@ -12,6 +12,7 @@ CommandLineThread::CommandLineThread(QObject *parent) :
 void CommandLineThread::run()
 {
     qDebug()<<"The cmd line is:" + mCmdLine;
+
     system(mCmdLine.toStdString().c_str());
 }
 

@@ -22,6 +22,12 @@ private slots:
     void onCmdThreadFinished();
     void onCmdThreadStart();
 
+    void on_pushButton_clicked();
+
+    void on_pushButton_3_clicked();
+
+    void on_pushButton_4_clicked();
+
 protected:
     void closeEvent(QCloseEvent *event);
 
@@ -29,8 +35,18 @@ private:
     CommandLineThread mCmdThread;
     QString mOpenAPKFilePath;
     QString mCurrentDir;
+    QString mChooseIconPath;
+    QString mChooseCornerPath;
+    QString mApkIconPath;
     QString mApkDecomplePath;
+    QString mAndroidManifestPath;
     QDir mApkDecompileDir;
+
+
+    QPixmap chooseIconPixmap;
+    QPixmap chooseCornerPixmap;
+
+
     QProgressDialog mProgressDialog;
     Ui::ToolWindow *ui;
 };
