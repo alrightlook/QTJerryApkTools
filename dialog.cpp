@@ -34,6 +34,9 @@ void Dialog::replyFinished(QNetworkReply* reply)
 
     if(200 == status) {
         QMessageBox::information(this, "Welcome", "Hey! Welcome you son of a ...");
+        this->close();
+        ToolWindow* tw = new ToolWindow();
+        tw->show();
     }
 
 }
@@ -63,7 +66,5 @@ void Dialog::on_pushButton_clicked()
 
     maneger->post(request, postData);
 
-    this->close();
-    ToolWindow* tw = new ToolWindow();
-    tw->show();
+
 }

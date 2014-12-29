@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui network xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -14,10 +14,14 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         dialog.cpp \
-    toolwindow.cpp
+    toolwindow.cpp \
+    commandlinethread.cpp \
+    parsemanifest.cpp
 
 HEADERS  += dialog.h \
-    toolwindow.h
+    toolwindow.h \
+    commandlinethread.h \
+    parsemanifest.h
 
 FORMS    += dialog.ui \
     toolwindow.ui
