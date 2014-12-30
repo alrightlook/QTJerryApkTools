@@ -15,12 +15,14 @@ SOURCES += main.cpp\
         dialog.cpp \
     toolwindow.cpp \
     commandlinethread.cpp \
-    parsemanifest.cpp
+    parsemanifest.cpp \
+    commandprocess.cpp
 
 HEADERS  += dialog.h \
     toolwindow.h \
     commandlinethread.h \
-    parsemanifest.h
+    parsemanifest.h \
+    commandprocess.h
 
 FORMS    += dialog.ui \
     toolwindow.ui

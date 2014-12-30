@@ -20,8 +20,8 @@ ToolWindow::ToolWindow(QWidget *parent) :
     mApkDecomplePath = mCurrentDir + "/Decomplie";
 
 
-    QObject::connect(&mCmdThread, SIGNAL(started()), this, SLOT(onCmdThreadStart()));
-    QObject::connect(&mCmdThread, SIGNAL(finished()), this, SLOT(onCmdThreadFinished()));
+    QObject::connect(&mCmdProc, SIGNAL(started()), this, SLOT(onCmdThreadStart()));
+    QObject::connect(&mCmdProc, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(onCmdThreadFinished(int, QProcess::ExitStatus)));
 
     QString env = getenv("PATH");
     qDebug () <<"Get evn is:" + env;
@@ -45,16 +45,17 @@ void ToolWindow::closeEvent(QCloseEvent *event)
     }
 }
 
-void ToolWindow::onCmdThreadFinished()
+void ToolWindow::onCmdThreadFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     qDebug()<<"The commandLine Thread Finished";
-    if(mCmdThread.GetCommandType() == CommandLineThread::APKDECOMPILE) {
+    if(mCmdProc.getType() == CommandProcess::APKDECOMPILE) {
 
         QString manifestPath = mApkDecomplePath + "/AndroidManifest.xml";
         mAndroidManifestPath = manifestPath;
         qDebug()<<"The androidmanivest path is:" + manifestPath;
         ParseManifest pm(manifestPath);
         ui->PackageNameEdit->setText(pm.getPackageName());
+        mApkIconPath = pm.getIconPath();
     }
     mProgressDialog.close();
 }
@@ -79,24 +80,23 @@ void ToolWindow::on_pushButton_2_clicked()
      apktoolCmd.replace(QString(")"), QString("\\)"));
      qDebug() << "The apktool Cmd line is:" + apktoolCmd;
 
-     mCmdThread.SetCommandType(CommandLineThread::APKDECOMPILE);
-     mCmdThread.SetCommandLine(apktoolCmd);
-     mCmdThread.start();
+     mCmdProc.setType(CommandProcess::APKDECOMPILE);
+     mCmdProc.start("apktool", QStringList()<<"d"<<"-f"<<mOpenAPKFilePath<<mApkDecomplePath);
 }
 
 void ToolWindow::on_pushButton_clicked()
 {
     if (ui->PackageNameEdit->text() != "") {
-        if(mCmdThread.isFinished()) {
+        if(mCmdProc.atEnd()) {
 
             ParseManifest pm(mAndroidManifestPath);
             pm.setPackageName(ui->PackageNameEdit->text());
-            mCmdThread.SetCommandType(CommandLineThread::APKCOMPILE);
+            mCmdProc.setType(CommandProcess::APKBUILD);
             QString apkSavedPath = QFileDialog::getSaveFileName(this, "Build Apk", "", "All apk Files(*.apk)");
             QString apktoolBuildCmd = "apktool b " + mApkDecomplePath + " " + apkSavedPath;
             qDebug() << "The build cmd is:" + apktoolBuildCmd;
-            mCmdThread.SetCommandLine(apktoolBuildCmd);
-            mCmdThread.start();
+            mCmdProc.start("apktool", QStringList()<<"b"<<mApkDecomplePath<<apkSavedPath);
+
         }
 
     }
@@ -122,4 +122,35 @@ void ToolWindow::on_pushButton_4_clicked()
     painter.drawPixmap(0,0, chooseCornerPixmap);
     painter.save();
     ui->LabelPreview->setPixmap(chooseIconPixmap);
+}
+
+void ToolWindow::on_pushButton_5_clicked()
+{
+    QString srcIconPath = mApkDecomplePath;
+    QString tmpIconPath = mApkIconPath;
+    srcIconPath = mApkDecomplePath + tmpIconPath.replace("@drawable/", "/res/drawable/") + ".png";
+    qDebug()<<srcIconPath;
+    chooseIconPixmap.save(srcIconPath, "PNG");
+    tmpIconPath = mApkIconPath;
+    srcIconPath = mApkDecomplePath + tmpIconPath.replace("@drawable/", "/res/drawable-hdpi/") + ".png";
+    qDebug()<<srcIconPath;
+    chooseIconPixmap.save(srcIconPath, "PNG");
+    tmpIconPath = mApkIconPath;
+    srcIconPath = mApkDecomplePath + tmpIconPath.replace("@drawable/", "/res/drawable-ldpi/")+ ".png";
+    qDebug()<<srcIconPath;
+    chooseIconPixmap.save(srcIconPath, "PNG");
+    tmpIconPath = mApkIconPath;
+    srcIconPath = mApkDecomplePath + tmpIconPath.replace("@drawable/", "/res/drawable-mdpi/") + ".png";
+    qDebug()<<srcIconPath;
+    chooseIconPixmap.save(srcIconPath, "PNG");
+    tmpIconPath = mApkIconPath;
+    srcIconPath = mApkDecomplePath + tmpIconPath.replace("@drawable/", "/res/drawable-xhdpi/")+ ".png";
+    qDebug()<<srcIconPath;
+    chooseIconPixmap.save(srcIconPath, "PNG");
+    tmpIconPath = mApkIconPath;
+    srcIconPath = mApkDecomplePath + tmpIconPath.replace("@drawable/", "/res/drawable-xxhdpi/")+ ".png";
+    qDebug()<<srcIconPath;
+    chooseIconPixmap.save(srcIconPath, "PNG");
+
+
 }

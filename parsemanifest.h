@@ -10,8 +10,10 @@ public:
     ParseManifest(QString filename);
     ~ParseManifest();
     QString getPackageName();
+    QString getIconPath();
     void setPackageName(QString packagename);
 private:
+    QString mIconPath;
     QString mPackageName;
     QString mAndroidManifestPath;
     QDomDocument xmlDoc;

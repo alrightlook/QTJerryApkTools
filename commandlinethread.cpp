@@ -21,7 +21,6 @@ int CommandLineThread::GetCommandType()
     return mType;
 }
 
-
 void CommandLineThread::SetCommandType(int type)
 {
     mType = type;

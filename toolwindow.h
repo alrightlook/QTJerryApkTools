@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <qdir.h>
 #include "commandlinethread.h"
+#include "commandprocess.h"
 #include "qprogressdialog.h"
 
 namespace Ui {
@@ -19,7 +20,7 @@ public:
 
 private slots:
     void on_pushButton_2_clicked();
-    void onCmdThreadFinished();
+    void onCmdThreadFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void onCmdThreadStart();
 
     void on_pushButton_clicked();
@@ -28,11 +29,13 @@ private slots:
 
     void on_pushButton_4_clicked();
 
+    void on_pushButton_5_clicked();
+
 protected:
     void closeEvent(QCloseEvent *event);
 
 private:
-    CommandLineThread mCmdThread;
+    CommandProcess mCmdProc;
     QString mOpenAPKFilePath;
     QString mCurrentDir;
     QString mChooseIconPath;
