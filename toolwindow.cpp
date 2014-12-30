@@ -8,6 +8,7 @@
 #include "parsemanifest.h"
 #include "QProcessEnvironment"
 #include "qpainter.h"
+#include "stdlib.h"
 
 ToolWindow::ToolWindow(QWidget *parent) :
     QWidget(parent),
@@ -27,7 +28,7 @@ ToolWindow::ToolWindow(QWidget *parent) :
     qDebug () <<"Get evn is:" + env;
     env += ":/usr/local/bin/";
     qDebug() << "env new is:" + env;
-    setenv("PATH", env.toStdString().c_str(), 1);
+    qputenv("PATH",QByteArray().append(env));
     qDebug() << mApkDecomplePath;
     env = getenv("PATH");
     qDebug()<<"The set env reslut is:" + env;
@@ -47,7 +48,7 @@ void ToolWindow::closeEvent(QCloseEvent *event)
 
 void ToolWindow::onCmdThreadFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    qDebug()<<"The commandLine Thread Finished";
+    qDebug()<<"The commandLine Thread Finished" + exitCode;
     if(mCmdProc.getType() == CommandProcess::APKDECOMPILE) {
 
         QString manifestPath = mApkDecomplePath + "/AndroidManifest.xml";
@@ -87,7 +88,6 @@ void ToolWindow::on_pushButton_2_clicked()
 void ToolWindow::on_pushButton_clicked()
 {
     if (ui->PackageNameEdit->text() != "") {
-        if(mCmdProc.atEnd()) {
 
             ParseManifest pm(mAndroidManifestPath);
             pm.setPackageName(ui->PackageNameEdit->text());
@@ -96,8 +96,6 @@ void ToolWindow::on_pushButton_clicked()
             QString apktoolBuildCmd = "apktool b " + mApkDecomplePath + " " + apkSavedPath;
             qDebug() << "The build cmd is:" + apktoolBuildCmd;
             mCmdProc.start("apktool", QStringList()<<"b"<<mApkDecomplePath<<apkSavedPath);
-
-        }
 
     }
 }

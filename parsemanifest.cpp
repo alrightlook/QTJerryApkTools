@@ -44,6 +44,7 @@ void ParseManifest::setPackageName(QString packagename)
     manifestNode.at(0).attributes().namedItem("package").setNodeValue(packagename);
 
     QFile savedFile(mAndroidManifestPath);
+    savedFile.remove();
     savedFile.open(QFile::ReadWrite | QFile::Text);
     QTextStream stream( &savedFile);
     qDebug() << xmlDoc.toString();
