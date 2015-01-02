@@ -26,7 +26,7 @@ ToolWindow::ToolWindow(QWidget *parent) :
 
     QString env = getenv("PATH");
     qDebug () <<"Get evn is:" + env;
-    env += ":/usr/local/bin/";
+    env += ";D:\\tools\\";
     qDebug() << "env new is:" + env;
     qputenv("PATH",QByteArray().append(env));
     qDebug() << mApkDecomplePath;
@@ -82,7 +82,9 @@ void ToolWindow::on_pushButton_2_clicked()
      qDebug() << "The apktool Cmd line is:" + apktoolCmd;
 
      mCmdProc.setType(CommandProcess::APKDECOMPILE);
-     mCmdProc.start("apktool", QStringList()<<"d"<<"-f"<<mOpenAPKFilePath<<mApkDecomplePath);
+     system("echo off");
+
+     mCmdProc.start("apktool.bat", QStringList()<<"d"<<"-f"<<mOpenAPKFilePath<<mApkDecomplePath);
 }
 
 void ToolWindow::on_pushButton_clicked()
@@ -95,7 +97,7 @@ void ToolWindow::on_pushButton_clicked()
             QString apkSavedPath = QFileDialog::getSaveFileName(this, "Build Apk", "", "All apk Files(*.apk)");
             QString apktoolBuildCmd = "apktool b " + mApkDecomplePath + " " + apkSavedPath;
             qDebug() << "The build cmd is:" + apktoolBuildCmd;
-            mCmdProc.start("apktool", QStringList()<<"b"<<mApkDecomplePath<<apkSavedPath);
+            mCmdProc.start("apktool.bat", QStringList()<<"b"<<mApkDecomplePath<<apkSavedPath);
 
     }
 }
