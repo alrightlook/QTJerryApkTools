@@ -24,6 +24,7 @@ router.post('/UserRegister', function(req, res) {
 
 	User.createUser(registerInfo, function(retCode) {
 	});
+	res.status(200).end();
 });
 
 
