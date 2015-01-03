@@ -9,6 +9,7 @@
 #include "qurlquery.h"
 #include "qmessagebox.h"
 #include "qjsondocument.h"
+#include "qjsonobject.h"
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
@@ -26,14 +27,18 @@ Dialog::~Dialog()
 
 void Dialog::replyFinished(QNetworkReply* reply)
 {
+    QString content = QString(reply->readAll());
     QVariant statusCode = reply->attribute( QNetworkRequest::HttpStatusCodeAttribute );
     if ( !statusCode.isValid() )
            return;
 
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(content.toUtf8());
+    QJsonObject resJsonObj = jsonDoc.object();
+    QJsonValue loginCode = resJsonObj["code"];
+    qDebug()<<loginCode;
     int status = statusCode.toInt();
-
-    if(200 == status) {
-        QMessageBox::information(this, "Welcome", "Hey! Welcome you son of a ...");
+    QMessageBox::information(this, "Welcome", content);
+    if(200 == loginCode.toInt()) {
         this->close();
         ToolWindow* tw = new ToolWindow();
         tw->show();
@@ -54,7 +59,7 @@ void Dialog::on_pushButton_clicked()
     QString userName = ui->userName->text();
     QString pwd = ui->userPassword->text();
 
-    keyValuePair.insert("username", userName);
+    keyValuePair.insert("account", userName);
     keyValuePair.insert("password", pwd);
 
     QJsonDocument doc = QJsonDocument::fromVariant(keyValuePair);
