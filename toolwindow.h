@@ -6,6 +6,9 @@
 #include "commandlinethread.h"
 #include "commandprocess.h"
 #include "qprogressdialog.h"
+#include "qurl.h"
+#include "QVariantMap"
+#include "QNetworkReply"
 
 namespace Ui {
 class ToolWindow;
@@ -16,12 +19,15 @@ class ToolWindow : public QWidget
     Q_OBJECT
 public:
     explicit ToolWindow(QWidget *parent = 0);
+    void setUser(QString user);
     ~ToolWindow();
 
 private slots:
     void on_pushButton_2_clicked();
     void onCmdThreadFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void onCmdThreadStart();
+
+    void replyFinished(QNetworkReply* reply);
 
     void on_pushButton_clicked();
 
@@ -33,8 +39,10 @@ private slots:
 
 protected:
     void closeEvent(QCloseEvent *event);
+    void postOperation(QUrl url, QVariantMap params);
 
 private:
+    QString mUser;
     CommandProcess mCmdProc;
     QString mOpenAPKFilePath;
     QString mCurrentDir;
@@ -48,7 +56,6 @@ private:
 
     QPixmap chooseIconPixmap;
     QPixmap chooseCornerPixmap;
-
 
     QProgressDialog mProgressDialog;
     Ui::ToolWindow *ui;

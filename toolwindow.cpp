@@ -46,6 +46,11 @@ void ToolWindow::closeEvent(QCloseEvent *event)
     }
 }
 
+void ToolWindow::setUser(QString user)
+{
+    mUser = user;
+}
+
 void ToolWindow::onCmdThreadFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     qDebug()<<"The commandLine Thread Finished" + exitCode;
@@ -73,6 +78,35 @@ ToolWindow::~ToolWindow()
     delete ui;
 }
 
+
+void ToolWindow::replyFinished(QNetworkReply* reply)
+{
+    qDebug()<<"reply called";
+    QString content = QString(reply->readAll());
+    QVariant statusCode = reply->attribute( QNetworkRequest::HttpStatusCodeAttribute );
+    if ( !statusCode.isValid() )
+           return;
+
+    qDebug()<<"checkout 1";
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(content.toUtf8());
+    QJsonObject resJsonObj = jsonDoc.object();
+    QJsonValue loginCode = resJsonObj["code"];
+    qDebug()<<loginCode;
+    int status = statusCode.toInt();
+    QMessageBox::information(this, "Welcome", content);
+    if(0 == loginCode.toInt()) {
+        ParseManifest pm(mAndroidManifestPath);
+        pm.setPackageName(ui->PackageNameEdit->text());
+        mCmdProc.setType(CommandProcess::APKBUILD);
+        QString apkSavedPath = QFileDialog::getSaveFileName(this, "Build Apk", "", "All apk Files(*.apk)");
+        QString apktoolBuildCmd = "apktool b " + mApkDecomplePath + " " + apkSavedPath;
+        qDebug() << "The build cmd is:" + apktoolBuildCmd;
+        mCmdProc.start("apktool", QStringList()<<"b"<<mApkDecomplePath<<apkSavedPath);
+    }
+
+}
+
+
 void ToolWindow::on_pushButton_2_clicked()
 {
      mOpenAPKFilePath = QFileDialog::getOpenFileName(this, "Open Apk File", "", "All apk Files(*.apk)");
@@ -85,17 +119,34 @@ void ToolWindow::on_pushButton_2_clicked()
      mCmdProc.start("apktool", QStringList()<<"d"<<"-f"<<mOpenAPKFilePath<<mApkDecomplePath);
 }
 
+void ToolWindow::postOperation(QUrl url, QVariantMap params)
+{
+    qDebug()<<url.toString();
+    QNetworkAccessManager* maneger = new QNetworkAccessManager(this);
+    QNetworkRequest request;
+    request.setUrl(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    QObject::connect(maneger, SIGNAL(finished(QNetworkReply *)), this, SLOT(replyFinished(QNetworkReply *)));
+    QJsonDocument doc = QJsonDocument::fromVariant(params);
+
+    QByteArray postData = doc.toJson();
+
+    maneger->post(request, postData);
+}
+
 void ToolWindow::on_pushButton_clicked()
 {
-    if (ui->PackageNameEdit->text() != "") {
+    QString inputPackageName = ui->PackageNameEdit->text();
 
-            ParseManifest pm(mAndroidManifestPath);
-            pm.setPackageName(ui->PackageNameEdit->text());
-            mCmdProc.setType(CommandProcess::APKBUILD);
-            QString apkSavedPath = QFileDialog::getSaveFileName(this, "Build Apk", "", "All apk Files(*.apk)");
-            QString apktoolBuildCmd = "apktool b " + mApkDecomplePath + " " + apkSavedPath;
-            qDebug() << "The build cmd is:" + apktoolBuildCmd;
-            mCmdProc.start("apktool", QStringList()<<"b"<<mApkDecomplePath<<apkSavedPath);
+    if (inputPackageName != "") {
+        QVariantMap params;
+        params.insert("account", mUser);
+        params.insert("pakcagename", inputPackageName);
+        QString apkSavedPath = QFileDialog::getSaveFileName(this, "Build Apk", "", "All apk Files(*.apk)");
+        QString apktoolBuildCmd = "apktool b " + mApkDecomplePath + " " + apkSavedPath;
+        params.insert("command", apktoolBuildCmd);
+        postOperation(QUrl("http://127.0.0.1:3000/operation"), params);
 
     }
 }

@@ -41,6 +41,7 @@ void Dialog::replyFinished(QNetworkReply* reply)
     if(200 == loginCode.toInt()) {
         this->close();
         ToolWindow* tw = new ToolWindow();
+        tw->setUser(ui->userName->text());
         tw->show();
     }
 
