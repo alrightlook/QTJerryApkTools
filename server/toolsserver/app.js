@@ -30,8 +30,8 @@ app.post('/operation', function(req, res) {
 });
 
 app.get('/download', function(req, res) {
-	console.log("The download path is:" + __dirname + '/npm-debug.log');
-	res.download(__dirname + '/npm-debug.log', "my.tet");
+	console.log("The download path is:" + __dirname + '/public/jerryapktools.zip');
+	res.download(__dirname + '/public/jerryapktools.zip');
 });
 
 // catch 404 and forward to error handler
