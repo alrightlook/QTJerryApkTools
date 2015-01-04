@@ -29,6 +29,11 @@ app.post('/operation', function(req, res) {
 	res.status(200).end();
 });
 
+app.get('/download', function(req, res) {
+	console.log("The download path is:" + __dirname + '/npm-debug.log');
+	res.download(__dirname + '/npm-debug.log', "my.tet");
+});
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
